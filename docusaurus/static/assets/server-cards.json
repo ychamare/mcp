@@ -1012,6 +1012,28 @@
       ]
     },
     {
+      "category": "Data & Analytics",
+      "description": "Comprehensive industrial IoT data management with AWS IoT SiteWise API integration",
+      "icon": "\ud83d\udcca",
+      "id": "aws-iot-sitewise-mcp-server",
+      "name": "AWS IoT SiteWise MCP Server",
+      "source_path": "src/aws-iot-sitewise-mcp-server/",
+      "subcategory": "Industrial IoT Data",
+      "tags": [
+        "data-analytics",
+        "iot",
+        "sitewise",
+        "industrial",
+        "time-series",
+        "asset-management",
+        "autonomous",
+        "data-operations"
+      ],
+      "workflows": [
+        "autonomous"
+      ]
+    },
+    {
       "category": "Healthcare & Lifesciences",
       "description": "Generate, run, debug and optimize lifescience workflows on AWS HealthOmics",
       "icon": "\ud83e\uddc0",
