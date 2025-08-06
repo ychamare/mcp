@@ -9,7 +9,7 @@ A comprehensive Model Context Protocol (MCP) server for AWS IoT SiteWise API int
 ## Features
 
 ### 🚀 **Extensive API Coverage**
-- **49 tools** covering of AWS IoT SiteWise functionality
+- **49 tools** covering AWS IoT SiteWise functionality
 - **22 read-only tools** for safe data exploration
 - **21 write operations** for resource management
 - **6 destructive operations** with safety controls
@@ -24,15 +24,21 @@ A comprehensive Model Context Protocol (MCP) server for AWS IoT SiteWise API int
 - **Asset & Asset Model Management**: Create, update, and organize industrial assets
 - **Time-Series Data**: Real-time and historical property values with aggregations
 - **Batch Operations**: Efficient bulk data retrieval and ingestion
-- **Gateway Management**: Connect on-premises systems to AWS. (External sevices depencies)
-- **Monitor Portals**: Web-based dashboards and visualizations (External sevices depencies)
+- **Gateway Management**: Connect on-premises systems to AWS (External service dependencies)
+- **Monitor Portals**: Web-based dashboards and visualizations (External service dependencies)
 - **Access Control**: Fine-grained security policies
 
 ## Quick Start
 
 ### Installation
 
-#### Option 1: UV (Recommended)
+#### Option 1: UVX (Recommended)
+```bash
+# Install and run directly with uvx
+uvx awslabs.aws-iot-sitewise-mcp-server
+```
+
+#### Option 2: UV
 ```bash
 # Clone the repository
 git clone https://github.com/awslabs/mcp.git
@@ -42,13 +48,14 @@ cd mcp/src/aws-iot-sitewise-mcp-server
 uv sync
 
 # Run the server
-uv run python -m awslabs.aws_iot_sitewise_mcp_server.server
+uv run awslabs.aws-iot-sitewise-mcp-server
 ```
 
-#### Option 2: Pip
+#### Option 3: Pip
 ```bash
-# Install from PyPI (when published)
-pip install awslabs.aws-iot-sitewise-mcp-server
+
+# Run the server
+awslabs.aws-iot-sitewise-mcp-server
 
 # Or install from source
 git clone https://github.com/awslabs/mcp.git
@@ -75,7 +82,7 @@ export AWS_PROFILE=your-profile-name
 
 ### Required IAM Permissions
 
-Your AWS credentials need permissions for IoT SiteWise operations. Open scope policy, only recommedend for testing:
+Your AWS credentials need permissions for IoT SiteWise operations. **Open scope policy, only recommended for testing**:
 
 ```json
 {
@@ -92,80 +99,18 @@ Your AWS credentials need permissions for IoT SiteWise operations. Open scope po
 }
 ```
 
-For production use, restrict permissions to specific resources and actions as needed. Restricting the Actions will also help mitigatetool miss usage, consider scope your permission to meet your use case needs.  
+For production use, restrict permissions to specific resources and actions as needed. Restricting the Actions will also help mitigate tool misuse - consider scoping your permissions to meet your use case needs.  
 
 ## Usage with MCP Clients
 
-### Claude Desktop
-
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "aws-iot-sitewise": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/mcp/src/aws-iot-sitewise-mcp-server",
-        "run",
-        "python",
-        "-m",
-        "awslabs.aws_iot_sitewise_mcp_server.server"
-      ],
-      "env": {
-        "AWS_REGION": "us-west-2",
-        "AWS_PROFILE": "your-profile"
-      }
-    }
-  }
-}
-```
-
-### Claude Code
-
-Configure in your workspace or global settings:
-
-```json
-{
-  "mcpServers": {
-    "aws-iot-sitewise": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/mcp/src/aws-iot-sitewise-mcp-server",
-        "run",
-        "python",
-        "-m",
-        "awslabs.aws_iot_sitewise_mcp_server.server"
-      ],
-      "env": {
-        "AWS_REGION": "us-west-2",
-        "AWS_PROFILE": "your-profile"
-      }
-    }
-  }
-}
-```
-
-### Amazon Q CLI
-
+### Amazon q cli
 Add to your `mcp.json` configuration file:
 
-#### Using UV (Recommended)
 ```json
 {
   "mcpServers": {
     "aws-iot-sitewise": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/mcp/src/aws-iot-sitewise-mcp-server",
-        "run",
-        "python",
-        "-m",
-        "awslabs.aws_iot_sitewise_mcp_server.server"
-      ],
+      "args": ["awslabs.aws-iot-sitewise-mcp-server"],
       "env": {
         "AWS_REGION": "us-west-2",
         "AWS_PROFILE": "your-profile"
@@ -175,19 +120,31 @@ Add to your `mcp.json` configuration file:
 }
 ```
 
-### Development/Testing
+### Claude Desktop
+Add to your `claude_desktop_config.json` configuration file:
 
-Run the server directly:
+```json
+{
+  "mcpServers": {
+    "aws-iot-sitewise": {
+      "args": ["awslabs.aws-iot-sitewise-mcp-server"],
+      "env": {
+        "AWS_REGION": "us-west-2",
+        "AWS_PROFILE": "your-profile"
+      }
+    }
+  }
+}
+```
+
+### Testing
 
 ```bash
-# Run with default settings
-uv run python -m awslabs.aws_iot_sitewise_mcp_server.server
+# Test with MCP Inspector
+npx @modelcontextprotocol/inspector uvx awslabs.aws-iot-sitewise-mcp-server
 
 # Run with debug logging
-FASTMCP_LOG_LEVEL=DEBUG uv run python -m awslabs.aws_iot_sitewise_mcp_server.server
-
-# Test with MCP Inspector
-npx @modelcontextprotocol/inspector uv --directory /path/to/aws-iot-sitewise-mcp-server run python -m awslabs.aws_iot_sitewise_mcp_server.server
+FASTMCP_LOG_LEVEL=DEBUG uvx awslabs.aws-iot-sitewise-mcp-server
 ```
 
 ## Available Tools
@@ -226,7 +183,9 @@ npx @modelcontextprotocol/inspector uv --directory /path/to/aws-iot-sitewise-mcp
 - `list_time_series` - List time series
 - `describe_time_series` - Get time series details
 - `list_access_policies` - List access policies
-- `list_tags_for_resource` - List resource tags
+- `execute_query` - Execute SQL queries against SiteWise data
+- `list_executions` - List query executions
+- `describe_execution` - Get query execution details
 
 ### ⚠️ Write Operations (21 tools)
 
@@ -263,9 +222,10 @@ npx @modelcontextprotocol/inspector uv --directory /path/to/aws-iot-sitewise-mcp
 - `associate_time_series_to_asset_property` - Link time series to property
 - `disassociate_time_series_from_asset_property` - Unlink time series
 
-**Resource Management:**
-- `tag_resource` - Add tags to resources
-- `untag_resource` - Remove tags from resources
+**Configuration:**
+- `put_default_encryption_configuration` - Set default encryption
+- `put_logging_options` - Configure logging
+- `put_storage_configuration` - Configure storage settings
 
 ### 🚨 Destructive Operations (6 tools)
 
@@ -277,6 +237,8 @@ npx @modelcontextprotocol/inspector uv --directory /path/to/aws-iot-sitewise-mcp
 - `delete_portal` - 🚨 Delete portal permanently
 - `delete_dashboard` - 🚨 Delete dashboard permanently
 - `delete_access_policy` - 🚨 Delete access policy permanently
+- `delete_time_series` - 🚨 Delete time series permanently
+- `delete_project` - 🚨 Delete project permanently
 
 ## Configuration
 
@@ -284,9 +246,38 @@ npx @modelcontextprotocol/inspector uv --directory /path/to/aws-iot-sitewise-mcp
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AWS_REGION` | `us-west-2` | AWS region for IoT SiteWise |
+| `AWS_REGION` | `us-east-1` | AWS region for IoT SiteWise |
 | `AWS_PROFILE` | None | AWS CLI profile to use |
 | `FASTMCP_LOG_LEVEL` | `WARNING` | Logging level (DEBUG, INFO, WARNING, ERROR) |
+
+## Development
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/awslabs/mcp.git
+cd mcp/src/aws-iot-sitewise-mcp-server
+
+# Install in editable mode for development
+pip install -e .
+
+# Or run directly from source
+uv run python -m awslabs.aws_iot_sitewise_mcp_server.server
+
+# Test the installed command
+awslabs.aws-iot-sitewise-mcp-server --version
+```
+
+### Building the Package
+
+```bash
+# Build package for distribution
+uv build
+
+# Install the built wheel for testing
+pip install dist/awslabs_aws_iot_sitewise_mcp_server-*.whl
+```
 
 ## License
 
@@ -294,4 +285,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ---
 
-**Built with ❤️ by the AWS GEN AI Labs team** 
+**Built with ❤️ by AWS Gen AI Labs and AWS IoT Sitewise Engineering teams** 

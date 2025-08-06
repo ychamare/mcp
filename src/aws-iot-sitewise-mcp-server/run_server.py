@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Runner script for AWS IoT SiteWise MCP Server."""
+"""
+This script starts the MCP server directly by using the Python import
+approach.
+"""
 
-import sys
 import os
-
-# Add current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sys
 
 from awslabs.aws_iot_sitewise_mcp_server.server import main
 
+# Add the project root to the Python path
+root_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, root_dir)
+
+
 if __name__ == "__main__":
+    print("Starting server using direct import...")
     main()
