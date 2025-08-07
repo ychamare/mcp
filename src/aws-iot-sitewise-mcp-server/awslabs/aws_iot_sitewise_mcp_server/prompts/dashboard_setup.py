@@ -4,8 +4,7 @@ from mcp.server.fastmcp.prompts import Prompt
 
 
 def dashboard_setup_helper(use_case: str, assets: str) -> str:
-    """
-    Generate a comprehensive guide for setting up monitoring dashboards in AWS IoT SiteWise.
+    """Generate a comprehensive guide for setting up monitoring dashboards in AWS IoT SiteWise.
 
     This prompt helps design and implement monitoring solutions including portal creation,
     project organization, dashboard design, and access control.
@@ -168,6 +167,6 @@ Include sample dashboard definitions and widget configurations for the specified
 # Create the prompt using from_function
 dashboard_setup_helper_prompt = Prompt.from_function(
     dashboard_setup_helper,
-    name="dashboard_setup_helper",
-    description="Generate a comprehensive guide for setting up monitoring dashboards in AWS IoT SiteWise",
+    name='dashboard_setup_helper',
+    description='Generate a comprehensive guide for setting up monitoring dashboards in AWS IoT SiteWise',
 )

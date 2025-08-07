@@ -99,7 +99,7 @@ Your AWS credentials need permissions for IoT SiteWise operations. **Open scope 
 }
 ```
 
-For production use, restrict permissions to specific resources and actions as needed. Restricting the Actions will also help mitigate tool misuse - consider scoping your permissions to meet your use case needs.  
+For production use, restrict permissions to specific resources and actions as needed. Restricting the Actions will also help mitigate tool misuse - consider scoping your permissions to meet your use case needs.
 
 ## Usage with MCP Clients
 
@@ -285,4 +285,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ---
 
-**Built with ❤️ by AWS Gen AI Labs and AWS IoT Sitewise Engineering teams** 
+**Built with ❤️ by AWS Gen AI Labs and AWS IoT Sitewise Engineering teams**

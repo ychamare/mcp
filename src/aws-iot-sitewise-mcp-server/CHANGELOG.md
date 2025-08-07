@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extensive AWS IoT SiteWise API coverage (49 tools)
 - Safety categorization with visual indicators (📖 read-only, ⚠️ write, 🚨 destructive, 🔐 security)
 - 22 read-only tools for safe data exploration
-- 21 write operation tools with safety warnings  
+- 21 write operation tools with safety warnings
 - 6 destructive operation tools with critical warnings
 - Asset and asset model management capabilities
 - Time-series data operations (current, historical, aggregated)
@@ -33,6 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - Safety indicators for all operations
-- Comprehensive input validation  
+- Comprehensive input validation
 - Secure credential handling
 - No sensitive data logging

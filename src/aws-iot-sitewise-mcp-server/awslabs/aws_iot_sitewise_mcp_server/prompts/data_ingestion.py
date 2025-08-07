@@ -4,8 +4,7 @@ from mcp.server.fastmcp.prompts import Prompt
 
 
 def data_ingestion_helper(data_source: str, target_assets: str) -> str:
-    """
-    Generate a comprehensive guide for setting up data ingestion into AWS IoT SiteWise.
+    """Generate a comprehensive guide for setting up data ingestion into AWS IoT SiteWise.
 
     This prompt helps design and implement data ingestion strategies for industrial data,
     including asset modeling, gateway configuration, and data mapping.
@@ -106,6 +105,6 @@ Address any potential challenges and provide solutions for common issues.
 # Create the prompt using from_function
 data_ingestion_helper_prompt = Prompt.from_function(
     data_ingestion_helper,
-    name="data_ingestion_helper",
-    description="Generate a comprehensive guide for setting up data ingestion into AWS IoT SiteWise",
+    name='data_ingestion_helper',
+    description='Generate a comprehensive guide for setting up data ingestion into AWS IoT SiteWise',
 )

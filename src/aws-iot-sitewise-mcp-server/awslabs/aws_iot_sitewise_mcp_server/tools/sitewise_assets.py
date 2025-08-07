@@ -1,11 +1,6 @@
 """AWS IoT SiteWise Assets Management Tools."""
 
-from typing import Any, Dict, Optional
-
 import boto3
-from botocore.exceptions import ClientError
-from mcp.server.fastmcp.tools import Tool
-
 from awslabs.aws_iot_sitewise_mcp_server.validation import (
     ValidationError,
     validate_asset_id,
@@ -15,23 +10,25 @@ from awslabs.aws_iot_sitewise_mcp_server.validation import (
     validate_region,
     validate_service_quotas,
 )
+from botocore.exceptions import ClientError
+from mcp.server.fastmcp.tools import Tool
+from typing import Any, Dict, Optional
 
 
 def create_asset(
     asset_name: str,
     asset_model_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     client_token: Optional[str] = None,
     tags: Optional[Dict[str, str]] = None,
     asset_description: Optional[str] = None,
     asset_id: Optional[str] = None,
     asset_external_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    from typing import Any, Dict, Optional
+    """From typing import Any, Dict, Optional
         Create a new asset in AWS IoT SiteWise.
 
-        Args:
+    Args:
             asset_name: A friendly name for the asset
             asset_model_id: The ID of the asset model from which to create the asset
             region: AWS region (default: us-east-1)
@@ -41,7 +38,7 @@ def create_asset(
             asset_id: The ID to assign to the asset
             asset_external_id: An external ID to assign to the asset
 
-        Returns:
+    Returns:
             Dictionary containing asset creation response
     """
     try:
@@ -54,55 +51,54 @@ def create_asset(
             validate_asset_id(asset_id)
 
         if asset_description and len(asset_description) > 2048:
-            raise ValidationError("Asset description cannot exceed 2048 characters")
+            raise ValidationError('Asset description cannot exceed 2048 characters')
 
         if client_token and len(client_token) > 64:
-            raise ValidationError("Client token cannot exceed 64 characters")
+            raise ValidationError('Client token cannot exceed 64 characters')
 
         if tags and len(tags) > 50:
-            raise ValidationError("Cannot have more than 50 tags per asset")
+            raise ValidationError('Cannot have more than 50 tags per asset')
 
         # Check service quotas (approximate)
-        validate_service_quotas("create_asset")
+        validate_service_quotas('create_asset')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"assetName": asset_name, "assetModelId": asset_model_id}
+        params: Dict[str, Any] = {'assetName': asset_name, 'assetModelId': asset_model_id}
 
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
         if tags:
-            params["tags"] = tags
+            params['tags'] = tags
         if asset_description:
-            params["assetDescription"] = asset_description
+            params['assetDescription'] = asset_description
         if asset_id:
-            params["assetId"] = asset_id
+            params['assetId'] = asset_id
         if asset_external_id:
-            params["assetExternalId"] = asset_external_id
+            params['assetExternalId'] = asset_external_id
 
         response = client.create_asset(**params)
         return {
-            "success": True,
-            "asset_id": response["assetId"],
-            "asset_arn": response["assetArn"],
-            "asset_status": response["assetStatus"],
+            'success': True,
+            'asset_id': response['assetId'],
+            'asset_arn': response['assetArn'],
+            'asset_status': response['assetStatus'],
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def describe_asset(
-    asset_id: str, region: str = "us-east-1", exclude_properties: bool = False
+    asset_id: str, region: str = 'us-east-1', exclude_properties: bool = False
 ) -> Dict[str, Any]:
-    """
-    Retrieve information about an asset.
+    """Retrieve information about an asset.
 
     Args:
         asset_id: The ID of the asset
@@ -113,43 +109,42 @@ def describe_asset(
         Dictionary containing asset information
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"assetId": asset_id}
+        params: Dict[str, Any] = {'assetId': asset_id}
         if exclude_properties:
-            params["excludeProperties"] = exclude_properties
+            params['excludeProperties'] = exclude_properties
 
         response = client.describe_asset(**params)
 
         return {
-            "success": True,
-            "asset_id": response["assetId"],
-            "asset_arn": response["assetArn"],
-            "asset_name": response["assetName"],
-            "asset_model_id": response["assetModelId"],
-            "asset_properties": response.get("assetProperties", []),
-            "asset_hierarchies": response.get("assetHierarchies", []),
-            "asset_composite_models": response.get("assetCompositeModels", []),
-            "asset_status": response["assetStatus"],
-            "asset_creation_date": response["assetCreationDate"].isoformat(),
-            "asset_last_update_date": response["assetLastUpdateDate"].isoformat(),
-            "asset_description": response.get("assetDescription", ""),
-            "asset_external_id": response.get("assetExternalId", ""),
+            'success': True,
+            'asset_id': response['assetId'],
+            'asset_arn': response['assetArn'],
+            'asset_name': response['assetName'],
+            'asset_model_id': response['assetModelId'],
+            'asset_properties': response.get('assetProperties', []),
+            'asset_hierarchies': response.get('assetHierarchies', []),
+            'asset_composite_models': response.get('assetCompositeModels', []),
+            'asset_status': response['assetStatus'],
+            'asset_creation_date': response['assetCreationDate'].isoformat(),
+            'asset_last_update_date': response['assetLastUpdateDate'].isoformat(),
+            'asset_description': response.get('assetDescription', ''),
+            'asset_external_id': response.get('assetExternalId', ''),
         }
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def list_assets(
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     next_token: Optional[str] = None,
     max_results: int = 50,
     asset_model_id: Optional[str] = None,
     filter_type: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Retrieve a paginated list of asset summaries.
+    """Retrieve a paginated list of asset summaries.
 
     Args:
         region: AWS region (default: us-east-1)
@@ -169,51 +164,50 @@ def list_assets(
         if asset_model_id:
             validate_asset_model_id(asset_model_id)
 
-        if filter_type and filter_type not in ["ALL", "TOP_LEVEL"]:
+        if filter_type and filter_type not in ['ALL', 'TOP_LEVEL']:
             raise ValidationError("Filter type must be 'ALL' or 'TOP_LEVEL'")
 
         if next_token and len(next_token) > 4096:
-            raise ValidationError("Next token too long")
+            raise ValidationError('Next token too long')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"maxResults": max_results}
+        params: Dict[str, Any] = {'maxResults': max_results}
 
         if next_token:
-            params["nextToken"] = next_token
+            params['nextToken'] = next_token
         if asset_model_id:
-            params["assetModelId"] = asset_model_id
+            params['assetModelId'] = asset_model_id
         if filter_type:
-            params["filter"] = filter_type
+            params['filter'] = filter_type
 
         response = client.list_assets(**params)
 
         return {
-            "success": True,
-            "asset_summaries": response["assetSummaries"],
-            "next_token": response.get("nextToken", ""),
+            'success': True,
+            'asset_summaries': response['assetSummaries'],
+            'next_token': response.get('nextToken', ''),
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def update_asset(
     asset_id: str,
     asset_name: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     client_token: Optional[str] = None,
     asset_description: Optional[str] = None,
     asset_external_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Update an asset's name, description, and external ID.
+    """Update an asset's name, description, and external ID.
 
     Args:
         asset_id: The ID of the asset to update
@@ -227,29 +221,28 @@ def update_asset(
         Dictionary containing update response
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"assetId": asset_id, "assetName": asset_name}
+        params: Dict[str, Any] = {'assetId': asset_id, 'assetName': asset_name}
 
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
         if asset_description:
-            params["assetDescription"] = asset_description
+            params['assetDescription'] = asset_description
         if asset_external_id:
-            params["assetExternalId"] = asset_external_id
+            params['assetExternalId'] = asset_external_id
 
         response = client.update_asset(**params)
-        return {"success": True, "asset_status": response["assetStatus"]}
+        return {'success': True, 'asset_status': response['assetStatus']}
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def delete_asset(
-    asset_id: str, region: str = "us-east-1", client_token: Optional[str] = None
+    asset_id: str, region: str = 'us-east-1', client_token: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    Delete an asset.
+    """Delete an asset.
 
     Args:
         asset_id: The ID of the asset to delete
@@ -260,28 +253,27 @@ def delete_asset(
         Dictionary containing deletion response
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"assetId": asset_id}
+        params: Dict[str, Any] = {'assetId': asset_id}
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
 
         response = client.delete_asset(**params)
-        return {"success": True, "asset_status": response["assetStatus"]}
+        return {'success': True, 'asset_status': response['assetStatus']}
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def associate_assets(
     asset_id: str,
     hierarchy_id: str,
     child_asset_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     client_token: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Associate a child asset with the given parent asset through a hierarchy.
+    """Associate a child asset with the given parent asset through a hierarchy.
 
     Args:
         asset_id: The ID of the parent asset
@@ -294,33 +286,32 @@ def associate_assets(
         Dictionary containing association response
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetId": asset_id,
-            "hierarchyId": hierarchy_id,
-            "childAssetId": child_asset_id,
+            'assetId': asset_id,
+            'hierarchyId': hierarchy_id,
+            'childAssetId': child_asset_id,
         }
 
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
 
         client.associate_assets(**params)
-        return {"success": True, "message": "Assets associated successfully"}
+        return {'success': True, 'message': 'Assets associated successfully'}
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def disassociate_assets(
     asset_id: str,
     hierarchy_id: str,
     child_asset_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     client_token: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Disassociate a child asset from the given parent asset through a hierarchy.
+    """Disassociate a child asset from the given parent asset through a hierarchy.
 
     Args:
         asset_id: The ID of the parent asset
@@ -333,34 +324,33 @@ def disassociate_assets(
         Dictionary containing disassociation response
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetId": asset_id,
-            "hierarchyId": hierarchy_id,
-            "childAssetId": child_asset_id,
+            'assetId': asset_id,
+            'hierarchyId': hierarchy_id,
+            'childAssetId': child_asset_id,
         }
 
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
 
         client.disassociate_assets(**params)
-        return {"success": True, "message": "Assets disassociated successfully"}
+        return {'success': True, 'message': 'Assets disassociated successfully'}
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def list_associated_assets(
     asset_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     hierarchy_id: Optional[str] = None,
-    traversal_direction: str = "PARENT",
+    traversal_direction: str = 'PARENT',
     next_token: Optional[str] = None,
     max_results: int = 50,
 ) -> Dict[str, Any]:
-    """
-    Retrieve a paginated list of associated assets.
+    """Retrieve a paginated list of associated assets.
 
     Args:
         asset_id: The ID of the asset to query
@@ -374,76 +364,76 @@ def list_associated_assets(
         Dictionary containing list of associated assets
     """
     try:
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetId": asset_id,
-            "traversalDirection": traversal_direction,
-            "maxResults": max_results,
+            'assetId': asset_id,
+            'traversalDirection': traversal_direction,
+            'maxResults': max_results,
         }
 
         if hierarchy_id:
-            params["hierarchyId"] = hierarchy_id
+            params['hierarchyId'] = hierarchy_id
         if next_token:
-            params["nextToken"] = next_token
+            params['nextToken'] = next_token
 
         response = client.list_associated_assets(**params)
 
         return {
-            "success": True,
-            "asset_summaries": response["assetSummaries"],
-            "next_token": response.get("nextToken", ""),
+            'success': True,
+            'asset_summaries': response['assetSummaries'],
+            'next_token': response.get('nextToken', ''),
         }
 
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 # Create MCP tools
 create_asset_tool = Tool.from_function(
     fn=create_asset,
-    name="create_asset",
-    description="Create a new asset in AWS IoT SiteWise from an asset model.",
+    name='create_asset',
+    description='Create a new asset in AWS IoT SiteWise from an asset model.',
 )
 
 describe_asset_tool = Tool.from_function(
     fn=describe_asset,
-    name="describe_asset",
-    description="Retrieve detailed information about an AWS IoT SiteWise asset.",
+    name='describe_asset',
+    description='Retrieve detailed information about an AWS IoT SiteWise asset.',
 )
 
 list_assets_tool = Tool.from_function(
     fn=list_assets,
-    name="list_assets",
-    description="Retrieve a paginated list of asset summaries from AWS IoT SiteWise.",
+    name='list_assets',
+    description='Retrieve a paginated list of asset summaries from AWS IoT SiteWise.',
 )
 
 update_asset_tool = Tool.from_function(
     fn=update_asset,
-    name="update_asset",
+    name='update_asset',
     description="Update an asset's name, description, and external ID in AWS IoT SiteWise.",
 )
 
 delete_asset_tool = Tool.from_function(
     fn=delete_asset,
-    name="delete_asset",
-    description="Delete an asset from AWS IoT SiteWise.",
+    name='delete_asset',
+    description='Delete an asset from AWS IoT SiteWise.',
 )
 
 associate_assets_tool = Tool.from_function(
     fn=associate_assets,
-    name="associate_assets",
-    description="Associate a child asset with a parent asset through a hierarchy in AWS IoT SiteWise.",
+    name='associate_assets',
+    description='Associate a child asset with a parent asset through a hierarchy in AWS IoT SiteWise.',
 )
 
 disassociate_assets_tool = Tool.from_function(
     fn=disassociate_assets,
-    name="disassociate_assets",
-    description="Disassociate a child asset from a parent asset through a hierarchy in AWS IoT SiteWise.",
+    name='disassociate_assets',
+    description='Disassociate a child asset from a parent asset through a hierarchy in AWS IoT SiteWise.',
 )
 
 list_associated_assets_tool = Tool.from_function(
     fn=list_associated_assets,
-    name="list_associated_assets",
-    description="Retrieve a paginated list of assets associated with a given asset in AWS IoT SiteWise.",
+    name='list_associated_assets',
+    description='Retrieve a paginated list of assets associated with a given asset in AWS IoT SiteWise.',
 )

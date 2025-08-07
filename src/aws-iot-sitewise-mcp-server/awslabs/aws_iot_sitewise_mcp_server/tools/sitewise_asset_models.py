@@ -1,11 +1,6 @@
 """AWS IoT SiteWise Asset Models Management Tools."""
 
-from typing import Any, Dict, List, Optional
-
 import boto3
-from botocore.exceptions import ClientError
-from mcp.server.fastmcp.tools import Tool
-
 from awslabs.aws_iot_sitewise_mcp_server.validation import (
     ValidationError,
     validate_asset_model_id,
@@ -14,11 +9,14 @@ from awslabs.aws_iot_sitewise_mcp_server.validation import (
     validate_region,
     validate_service_quotas,
 )
+from botocore.exceptions import ClientError
+from mcp.server.fastmcp.tools import Tool
+from typing import Any, Dict, List, Optional
 
 
 def create_asset_model(
     asset_model_name: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     asset_model_description: Optional[str] = None,
     asset_model_properties: Optional[List[Dict]] = None,
     asset_model_hierarchies: Optional[List[Dict]] = None,
@@ -27,10 +25,9 @@ def create_asset_model(
     tags: Optional[Dict[str, str]] = None,
     asset_model_id: Optional[str] = None,
     asset_model_external_id: Optional[str] = None,
-    asset_model_type: str = "ASSET_MODEL",
+    asset_model_type: str = 'ASSET_MODEL',
 ) -> Dict[str, Any]:
-    """
-    Create an asset model in AWS IoT SiteWise.
+    """Create an asset model in AWS IoT SiteWise.
 
     Args:
         asset_model_name: A unique, friendly name for the asset model
@@ -56,76 +53,75 @@ def create_asset_model(
             validate_asset_model_id(asset_model_id)
 
         if asset_model_description and len(asset_model_description) > 2048:
-            raise ValidationError("Asset model description cannot exceed 2048 characters")
+            raise ValidationError('Asset model description cannot exceed 2048 characters')
 
         if client_token and len(client_token) > 64:
-            raise ValidationError("Client token cannot exceed 64 characters")
+            raise ValidationError('Client token cannot exceed 64 characters')
 
         if tags and len(tags) > 50:
-            raise ValidationError("Cannot have more than 50 tags per asset model")
+            raise ValidationError('Cannot have more than 50 tags per asset model')
 
         if asset_model_properties:
             validate_asset_model_properties(asset_model_properties)
 
         if asset_model_hierarchies and len(asset_model_hierarchies) > 10:
-            raise ValidationError("Cannot have more than 10 hierarchies per asset model")
+            raise ValidationError('Cannot have more than 10 hierarchies per asset model')
 
         if asset_model_composite_models and len(asset_model_composite_models) > 10:
-            raise ValidationError("Cannot have more than 10 composite models per asset model")
+            raise ValidationError('Cannot have more than 10 composite models per asset model')
 
         # Check service quotas
-        validate_service_quotas("create_asset_model")
+        validate_service_quotas('create_asset_model')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetModelName": asset_model_name,
-            "assetModelType": asset_model_type,
+            'assetModelName': asset_model_name,
+            'assetModelType': asset_model_type,
         }
 
         if asset_model_description:
-            params["assetModelDescription"] = asset_model_description
+            params['assetModelDescription'] = asset_model_description
         if asset_model_properties:
-            params["assetModelProperties"] = asset_model_properties
+            params['assetModelProperties'] = asset_model_properties
         if asset_model_hierarchies:
-            params["assetModelHierarchies"] = asset_model_hierarchies
+            params['assetModelHierarchies'] = asset_model_hierarchies
         if asset_model_composite_models:
-            params["assetModelCompositeModels"] = asset_model_composite_models
+            params['assetModelCompositeModels'] = asset_model_composite_models
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
         if tags:
-            params["tags"] = tags
+            params['tags'] = tags
         if asset_model_id:
-            params["assetModelId"] = asset_model_id
+            params['assetModelId'] = asset_model_id
         if asset_model_external_id:
-            params["assetModelExternalId"] = asset_model_external_id
+            params['assetModelExternalId'] = asset_model_external_id
 
         response = client.create_asset_model(**params)
         return {
-            "success": True,
-            "asset_model_id": response["assetModelId"],
-            "asset_model_arn": response["assetModelArn"],
-            "asset_model_status": response["assetModelStatus"],
+            'success': True,
+            'asset_model_id': response['assetModelId'],
+            'asset_model_arn': response['assetModelArn'],
+            'asset_model_status': response['assetModelStatus'],
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def describe_asset_model(
     asset_model_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     exclude_properties: bool = False,
-    asset_model_version: str = "LATEST",
+    asset_model_version: str = 'LATEST',
 ) -> Dict[str, Any]:
-    """
-    Retrieve information about an asset model.
+    """Retrieve information about an asset model.
 
     Args:
         asset_model_id: The ID of the asset model
@@ -141,57 +137,56 @@ def describe_asset_model(
         validate_region(region)
         validate_asset_model_id(asset_model_id)
 
-        if asset_model_version not in ["LATEST", "ACTIVE"]:
+        if asset_model_version not in ['LATEST', 'ACTIVE']:
             raise ValidationError("Asset model version must be 'LATEST' or 'ACTIVE'")
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetModelId": asset_model_id,
-            "assetModelVersion": asset_model_version,
+            'assetModelId': asset_model_id,
+            'assetModelVersion': asset_model_version,
         }
 
         if exclude_properties:
-            params["excludeProperties"] = exclude_properties
+            params['excludeProperties'] = exclude_properties
 
         response = client.describe_asset_model(**params)
 
         return {
-            "success": True,
-            "asset_model_id": response["assetModelId"],
-            "asset_model_arn": response["assetModelArn"],
-            "asset_model_name": response["assetModelName"],
-            "asset_model_description": response.get("assetModelDescription", ""),
-            "asset_model_properties": response.get("assetModelProperties", []),
-            "asset_model_hierarchies": response.get("assetModelHierarchies", []),
-            "asset_model_composite_models": response.get("assetModelCompositeModels", []),
-            "asset_model_status": response["assetModelStatus"],
-            "asset_model_type": response["assetModelType"],
-            "asset_model_creation_date": response["assetModelCreationDate"].isoformat(),
-            "asset_model_last_update_date": response["assetModelLastUpdateDate"].isoformat(),
-            "asset_model_version": response.get("assetModelVersion", ""),
-            "asset_model_version_description": response.get("assetModelVersionDescription", ""),
-            "asset_model_external_id": response.get("assetModelExternalId", ""),
+            'success': True,
+            'asset_model_id': response['assetModelId'],
+            'asset_model_arn': response['assetModelArn'],
+            'asset_model_name': response['assetModelName'],
+            'asset_model_description': response.get('assetModelDescription', ''),
+            'asset_model_properties': response.get('assetModelProperties', []),
+            'asset_model_hierarchies': response.get('assetModelHierarchies', []),
+            'asset_model_composite_models': response.get('assetModelCompositeModels', []),
+            'asset_model_status': response['assetModelStatus'],
+            'asset_model_type': response['assetModelType'],
+            'asset_model_creation_date': response['assetModelCreationDate'].isoformat(),
+            'asset_model_last_update_date': response['assetModelLastUpdateDate'].isoformat(),
+            'asset_model_version': response.get('assetModelVersion', ''),
+            'asset_model_version_description': response.get('assetModelVersionDescription', ''),
+            'asset_model_external_id': response.get('assetModelExternalId', ''),
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def list_asset_models(
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     next_token: Optional[str] = None,
     max_results: int = 50,
     asset_model_types: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    """
-    Retrieve a paginated list of summaries for all asset models.
+    """Retrieve a paginated list of summaries for all asset models.
 
     Args:
         region: AWS region (default: us-east-1)
@@ -208,46 +203,46 @@ def list_asset_models(
         validate_max_results(max_results, min_val=1, max_val=250)
 
         if next_token and len(next_token) > 4096:
-            raise ValidationError("Next token too long")
+            raise ValidationError('Next token too long')
 
         if asset_model_types:
             for asset_type in asset_model_types:
-                if asset_type not in ["ASSET_MODEL", "COMPONENT_MODEL"]:
+                if asset_type not in ['ASSET_MODEL', 'COMPONENT_MODEL']:
                     raise ValidationError(
                         "Asset model type must be 'ASSET_MODEL' or 'COMPONENT_MODEL'"
                     )
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"maxResults": max_results}
+        params: Dict[str, Any] = {'maxResults': max_results}
 
         if next_token:
-            params["nextToken"] = next_token
+            params['nextToken'] = next_token
         if asset_model_types:
-            params["assetModelTypes"] = asset_model_types
+            params['assetModelTypes'] = asset_model_types
 
         response = client.list_asset_models(**params)
 
         return {
-            "success": True,
-            "asset_model_summaries": response["assetModelSummaries"],
-            "next_token": response.get("nextToken", ""),
+            'success': True,
+            'asset_model_summaries': response['assetModelSummaries'],
+            'next_token': response.get('nextToken', ''),
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def update_asset_model(
     asset_model_id: str,
     asset_model_name: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     asset_model_description: Optional[str] = None,
     asset_model_properties: Optional[List[Dict]] = None,
     asset_model_hierarchies: Optional[List[Dict]] = None,
@@ -255,8 +250,7 @@ def update_asset_model(
     client_token: Optional[str] = None,
     asset_model_external_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Update an asset model.
+    """Update an asset model.
 
     Args:
         asset_model_id: The ID of the asset model to update
@@ -278,58 +272,57 @@ def update_asset_model(
         validate_asset_model_id(asset_model_id)
 
         if asset_model_description and len(asset_model_description) > 2048:
-            raise ValidationError("Asset model description cannot exceed 2048 characters")
+            raise ValidationError('Asset model description cannot exceed 2048 characters')
 
         if client_token and len(client_token) > 64:
-            raise ValidationError("Client token cannot exceed 64 characters")
+            raise ValidationError('Client token cannot exceed 64 characters')
 
         if asset_model_properties:
             validate_asset_model_properties(asset_model_properties)
 
         if asset_model_hierarchies and len(asset_model_hierarchies) > 10:
-            raise ValidationError("Cannot have more than 10 hierarchies per asset model")
+            raise ValidationError('Cannot have more than 10 hierarchies per asset model')
 
         if asset_model_composite_models and len(asset_model_composite_models) > 10:
-            raise ValidationError("Cannot have more than 10 composite models per asset model")
+            raise ValidationError('Cannot have more than 10 composite models per asset model')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetModelId": asset_model_id,
-            "assetModelName": asset_model_name,
+            'assetModelId': asset_model_id,
+            'assetModelName': asset_model_name,
         }
 
         if asset_model_description:
-            params["assetModelDescription"] = asset_model_description
+            params['assetModelDescription'] = asset_model_description
         if asset_model_properties:
-            params["assetModelProperties"] = asset_model_properties
+            params['assetModelProperties'] = asset_model_properties
         if asset_model_hierarchies:
-            params["assetModelHierarchies"] = asset_model_hierarchies
+            params['assetModelHierarchies'] = asset_model_hierarchies
         if asset_model_composite_models:
-            params["assetModelCompositeModels"] = asset_model_composite_models
+            params['assetModelCompositeModels'] = asset_model_composite_models
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
         if asset_model_external_id:
-            params["assetModelExternalId"] = asset_model_external_id
+            params['assetModelExternalId'] = asset_model_external_id
 
         response = client.update_asset_model(**params)
-        return {"success": True, "asset_model_status": response["assetModelStatus"]}
+        return {'success': True, 'asset_model_status': response['assetModelStatus']}
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def delete_asset_model(
-    asset_model_id: str, region: str = "us-east-1", client_token: Optional[str] = None
+    asset_model_id: str, region: str = 'us-east-1', client_token: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    Delete an asset model.
+    """Delete an asset model.
 
     Args:
         asset_model_id: The ID of the asset model to delete
@@ -345,37 +338,36 @@ def delete_asset_model(
         validate_asset_model_id(asset_model_id)
 
         if client_token and len(client_token) > 64:
-            raise ValidationError("Client token cannot exceed 64 characters")
+            raise ValidationError('Client token cannot exceed 64 characters')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
-        params: Dict[str, Any] = {"assetModelId": asset_model_id}
+        params: Dict[str, Any] = {'assetModelId': asset_model_id}
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
 
         response = client.delete_asset_model(**params)
-        return {"success": True, "asset_model_status": response["assetModelStatus"]}
+        return {'success': True, 'asset_model_status': response['assetModelStatus']}
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def list_asset_model_properties(
     asset_model_id: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     next_token: Optional[str] = None,
     max_results: int = 50,
-    asset_model_version: str = "LATEST",
+    asset_model_version: str = 'LATEST',
     filter_type: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Retrieve a paginated list of properties associated with an asset model.
+    """Retrieve a paginated list of properties associated with an asset model.
 
     Args:
         asset_model_id: The ID of the asset model
@@ -395,50 +387,50 @@ def list_asset_model_properties(
         validate_max_results(max_results, min_val=1, max_val=250)
 
         if next_token and len(next_token) > 4096:
-            raise ValidationError("Next token too long")
+            raise ValidationError('Next token too long')
 
-        if asset_model_version not in ["LATEST", "ACTIVE"]:
+        if asset_model_version not in ['LATEST', 'ACTIVE']:
             raise ValidationError("Asset model version must be 'LATEST' or 'ACTIVE'")
 
-        if filter_type and filter_type not in ["ALL", "BASE"]:
+        if filter_type and filter_type not in ['ALL', 'BASE']:
             raise ValidationError("Filter type must be 'ALL' or 'BASE'")
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetModelId": asset_model_id,
-            "maxResults": max_results,
-            "assetModelVersion": asset_model_version,
+            'assetModelId': asset_model_id,
+            'maxResults': max_results,
+            'assetModelVersion': asset_model_version,
         }
 
         if next_token:
-            params["nextToken"] = next_token
+            params['nextToken'] = next_token
         if filter_type:
-            params["filter"] = filter_type
+            params['filter'] = filter_type
 
         response = client.list_asset_model_properties(**params)
 
         return {
-            "success": True,
-            "asset_model_property_summaries": response["assetModelPropertySummaries"],
-            "next_token": response.get("nextToken", ""),
+            'success': True,
+            'asset_model_property_summaries': response['assetModelPropertySummaries'],
+            'next_token': response.get('nextToken', ''),
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 def create_asset_model_composite_model(
     asset_model_id: str,
     asset_model_composite_model_name: str,
     asset_model_composite_model_type: str,
-    region: str = "us-east-1",
+    region: str = 'us-east-1',
     asset_model_composite_model_description: Optional[str] = None,
     asset_model_composite_model_properties: Optional[List[Dict]] = None,
     client_token: Optional[str] = None,
@@ -447,8 +439,7 @@ def create_asset_model_composite_model(
     parent_asset_model_composite_model_id: Optional[str] = None,
     composed_asset_model_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Create a composite model for an existing asset model.
+    """Create a composite model for an existing asset model.
 
     Args:
         asset_model_id: The ID of the asset model this composite model is a part of
@@ -475,95 +466,95 @@ def create_asset_model_composite_model(
             asset_model_composite_model_description
             and len(asset_model_composite_model_description) > 2048
         ):
-            raise ValidationError("Composite model description cannot exceed 2048 characters")
+            raise ValidationError('Composite model description cannot exceed 2048 characters')
 
         if client_token and len(client_token) > 64:
-            raise ValidationError("Client token cannot exceed 64 characters")
+            raise ValidationError('Client token cannot exceed 64 characters')
 
         if asset_model_composite_model_properties:
             if len(asset_model_composite_model_properties) > 200:
-                raise ValidationError("Cannot have more than 200 properties per composite model")
+                raise ValidationError('Cannot have more than 200 properties per composite model')
 
-        client = boto3.client("iotsitewise", region_name=region)
+        client = boto3.client('iotsitewise', region_name=region)
 
         params: Dict[str, Any] = {
-            "assetModelId": asset_model_id,
-            "assetModelCompositeModelName": asset_model_composite_model_name,
-            "assetModelCompositeModelType": asset_model_composite_model_type,
+            'assetModelId': asset_model_id,
+            'assetModelCompositeModelName': asset_model_composite_model_name,
+            'assetModelCompositeModelType': asset_model_composite_model_type,
         }
 
         if asset_model_composite_model_description:
-            params["assetModelCompositeModelDescription"] = asset_model_composite_model_description
+            params['assetModelCompositeModelDescription'] = asset_model_composite_model_description
         if asset_model_composite_model_properties:
-            params["assetModelCompositeModelProperties"] = asset_model_composite_model_properties
+            params['assetModelCompositeModelProperties'] = asset_model_composite_model_properties
         if client_token:
-            params["clientToken"] = client_token
+            params['clientToken'] = client_token
         if asset_model_composite_model_id:
-            params["assetModelCompositeModelId"] = asset_model_composite_model_id
+            params['assetModelCompositeModelId'] = asset_model_composite_model_id
         if asset_model_composite_model_external_id:
-            params["assetModelCompositeModelExternalId"] = asset_model_composite_model_external_id
+            params['assetModelCompositeModelExternalId'] = asset_model_composite_model_external_id
         if parent_asset_model_composite_model_id:
-            params["parentAssetModelCompositeModelId"] = parent_asset_model_composite_model_id
+            params['parentAssetModelCompositeModelId'] = parent_asset_model_composite_model_id
         if composed_asset_model_id:
-            params["composedAssetModelId"] = composed_asset_model_id
+            params['composedAssetModelId'] = composed_asset_model_id
 
         response = client.create_asset_model_composite_model(**params)
         return {
-            "success": True,
-            "asset_model_composite_model_id": response["assetModelCompositeModelId"],
-            "asset_model_composite_model_path": response["assetModelCompositeModelPath"],
-            "asset_model_status": response["assetModelStatus"],
+            'success': True,
+            'asset_model_composite_model_id': response['assetModelCompositeModelId'],
+            'asset_model_composite_model_path': response['assetModelCompositeModelPath'],
+            'asset_model_status': response['assetModelStatus'],
         }
 
     except ValidationError as e:
         return {
-            "success": False,
-            "error": f"Validation error: {str(e)}",
-            "error_code": "ValidationException",
+            'success': False,
+            'error': f'Validation error: {str(e)}',
+            'error_code': 'ValidationException',
         }
     except ClientError as e:
-        return {"success": False, "error": str(e), "error_code": e.response["Error"]["Code"]}
+        return {'success': False, 'error': str(e), 'error_code': e.response['Error']['Code']}
 
 
 # Create MCP tools
 create_asset_model_tool = Tool.from_function(
     fn=create_asset_model,
-    name="create_asset_model",
-    description="Create an asset model in AWS IoT SiteWise that defines the structure and properties for assets.",
+    name='create_asset_model',
+    description='Create an asset model in AWS IoT SiteWise that defines the structure and properties for assets.',
 )
 
 describe_asset_model_tool = Tool.from_function(
     fn=describe_asset_model,
-    name="describe_asset_model",
-    description="Retrieve detailed information about an AWS IoT SiteWise asset model.",
+    name='describe_asset_model',
+    description='Retrieve detailed information about an AWS IoT SiteWise asset model.',
 )
 
 list_asset_models_tool = Tool.from_function(
     fn=list_asset_models,
-    name="list_asset_models",
-    description="Retrieve a paginated list of asset model summaries from AWS IoT SiteWise.",
+    name='list_asset_models',
+    description='Retrieve a paginated list of asset model summaries from AWS IoT SiteWise.',
 )
 
 update_asset_model_tool = Tool.from_function(
     fn=update_asset_model,
-    name="update_asset_model",
+    name='update_asset_model',
     description="Update an asset model's properties, hierarchies, and composite models in AWS IoT SiteWise.",
 )
 
 delete_asset_model_tool = Tool.from_function(
     fn=delete_asset_model,
-    name="delete_asset_model",
-    description="Delete an asset model from AWS IoT SiteWise.",
+    name='delete_asset_model',
+    description='Delete an asset model from AWS IoT SiteWise.',
 )
 
 list_asset_model_properties_tool = Tool.from_function(
     fn=list_asset_model_properties,
-    name="list_asset_model_properties",
-    description="Retrieve a paginated list of properties associated with an asset model in AWS IoT SiteWise.",
+    name='list_asset_model_properties',
+    description='Retrieve a paginated list of properties associated with an asset model in AWS IoT SiteWise.',
 )
 
 create_asset_model_composite_model_tool = Tool.from_function(
     fn=create_asset_model_composite_model,
-    name="create_asset_model_composite_model",
-    description="Create a composite model for an existing asset model in AWS IoT SiteWise.",
+    name='create_asset_model_composite_model',
+    description='Create a composite model for an existing asset model in AWS IoT SiteWise.',
 )

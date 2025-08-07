@@ -3,9 +3,8 @@
 from mcp.server.fastmcp.prompts import Prompt
 
 
-def data_exploration_helper(exploration_goal: str, time_range: str = "last 7 days") -> str:
-    """
-    Generate comprehensive guidance for exploring IoT SiteWise data using the executeQuery API.
+def data_exploration_helper(exploration_goal: str, time_range: str = 'last 7 days') -> str:
+    """Generate comprehensive guidance for exploring IoT SiteWise data using the executeQuery API.
 
     This prompt helps users leverage the SQL capabilities of AWS IoT SiteWise
     to perform analytics, aggregations, and data exploration using the correct
@@ -103,7 +102,7 @@ The executeQuery API supports SQL-like query language with:
 ### Core Views:
 ```sql
 -- ASSET VIEW: Contains information about the asset and model derivation
--- Columns: asset_id, asset_name, asset_description, asset_model_id, 
+-- Columns: asset_id, asset_name, asset_description, asset_model_id,
 --          parent_asset_id, asset_external_id, asset_model_external_id, hierarchy_id
 
 -- ASSET_PROPERTY VIEW: Contains information about the asset property's structure
@@ -129,7 +128,7 @@ The executeQuery API supports SQL-like query language with:
 ### Asset and Property Discovery
 ```sql
 -- Basic asset inventory with correct column names
-SELECT 
+SELECT
     a.asset_id,
     a.asset_name,
     a.asset_description,
@@ -142,7 +141,7 @@ ORDER BY a.asset_name;
 ### Property Analysis with Data Types
 ```sql
 -- Discover all properties with their characteristics using correct view and column names
-SELECT 
+SELECT
     ap.asset_id,
     ap.property_id,
     ap.property_name,
@@ -158,10 +157,10 @@ ORDER BY ap.asset_id, ap.property_name;
 ### Basic Time Series Analysis (Using Implicit JOIN)
 ```sql
 -- Get recent data for specific assets with correct column names
-SELECT 
-    rts.asset_id, 
-    ap.property_name, 
-    rts.event_timestamp, 
+SELECT
+    rts.asset_id,
+    ap.property_name,
+    rts.event_timestamp,
     rts.double_value,
     rts.quality
 FROM raw_time_series rts, asset_property ap
@@ -176,7 +175,7 @@ LIMIT 1000;
 ### Latest Values Analysis (Using Implicit JOIN)
 ```sql
 -- Get latest values for all properties with correct view
-SELECT 
+SELECT
     lvts.asset_id,
     ap.property_name,
     lvts.event_timestamp,
@@ -219,7 +218,7 @@ ORDER BY 4 DESC;
 ### Date/Time Analysis Examples
 ```sql
 -- Date manipulation with supported functions
-SELECT 
+SELECT
     rts.asset_id,
     ap.property_name,
     rts.event_timestamp,
@@ -238,7 +237,7 @@ ORDER BY rts.event_timestamp DESC;
 ### Type Conversion Examples
 ```sql
 -- Convert different data types
-SELECT 
+SELECT
     rts.asset_id,
     TO_DATE(rts.event_timestamp) AS date_value,
     TO_TIME(rts.event_timestamp) AS time_value,
@@ -252,10 +251,10 @@ LIMIT 10;
 ```sql
 -- Use attribute value columns for better performance for attribute properties
 -- Note: Only one attribute value type can be non-null per property
-SELECT 
+SELECT
     ap.asset_id,
     ap.property_name,
-    CASE 
+    CASE
         WHEN ap.string_attribute_value IS NOT NULL THEN ap.string_attribute_value
         WHEN ap.double_attribute_value IS NOT NULL THEN CAST(ap.double_attribute_value AS STRING)
         WHEN ap.int_attribute_value IS NOT NULL THEN CAST(ap.int_attribute_value AS STRING)
@@ -263,7 +262,7 @@ SELECT
         ELSE 'NULL'
     END as attribute_value
 FROM asset_property ap
-WHERE ap.property_type = 'attribute' 
+WHERE ap.property_type = 'attribute'
   AND (ap.string_attribute_value LIKE 'my-property-%'
        OR ap.double_attribute_value > 100.0);
 ```
@@ -271,7 +270,7 @@ WHERE ap.property_type = 'attribute'
 ### Precomputed Aggregates with Filters
 ```sql
 -- Include quality and resolution filters for precomputed_aggregates
-SELECT 
+SELECT
     pa.asset_id,
     ap.property_name,
     pa.resolution,
@@ -315,7 +314,7 @@ ORDER BY 4 DESC;
 ### Comprehensive Data Quality Analysis
 ```sql
 -- Multi-dimensional data quality assessment with correct column names
-SELECT 
+SELECT
     a.asset_id,
     a.asset_name,
     ap.property_name,
@@ -341,7 +340,7 @@ ORDER BY quality_percent DESC, completeness_percent DESC;
 ### Efficient Historical Analysis
 ```sql
 -- Use precomputed aggregates for fast historical analysis
-SELECT 
+SELECT
     pa.asset_id,
     a.asset_name,
     ap.property_name,
@@ -367,7 +366,7 @@ ORDER BY pa.event_timestamp DESC, daily_avg DESC;
 ### Efficient Query Patterns
 ```sql
 -- Optimized query for large datasets with correct column names
-SELECT 
+SELECT
     rts.asset_id,
     ap.property_name,
     COUNT(*) as data_points,
@@ -376,7 +375,7 @@ FROM raw_time_series rts, asset_property ap
 WHERE rts.property_id = ap.property_id
   AND rts.event_timestamp >= TIMESTAMP_SUB(HOUR, 24, NOW())
   AND rts.asset_id IN (
-      SELECT asset_id FROM asset 
+      SELECT asset_id FROM asset
       WHERE asset_model_id = 'critical-equipment-model'
       LIMIT 100
   )
@@ -413,10 +412,10 @@ LIMIT 10000;
    ```sql
    -- Time-based filtering with dynamic ranges
    WHERE event_timestamp >= TIMESTAMP_SUB(DAY, 7, NOW())
-   
+
    -- Quality filtering
    WHERE quality = 'GOOD'
-   
+
    -- Value range filtering
    WHERE double_value IS NOT NULL AND double_value BETWEEN 0 AND 1000
    ```
@@ -446,6 +445,6 @@ Use the `execute_query` tool with these correct view names and column names to p
 # Create the prompt using from_function
 data_exploration_helper_prompt = Prompt.from_function(
     data_exploration_helper,
-    name="data_exploration_helper",
-    description="Generate comprehensive guidance for exploring IoT data using AWS IoT SiteWise analytics with correct view schemas and column names from official AWS documentation",
+    name='data_exploration_helper',
+    description='Generate comprehensive guidance for exploring IoT data using AWS IoT SiteWise analytics with correct view schemas and column names from official AWS documentation',
 )

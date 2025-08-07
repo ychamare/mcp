@@ -1,11 +1,8 @@
 import argparse
 import os
 import signal
-import sys
-
 from anyio import create_task_group, open_signal_receiver, run
 from anyio.abc import CancelScope
-from mcp.server.fastmcp import FastMCP
 
 # Import IoT SiteWise prompts
 from awslabs.aws_iot_sitewise_mcp_server.prompts.asset_hierarchy import (
@@ -99,6 +96,7 @@ from awslabs.aws_iot_sitewise_mcp_server.tools.sitewise_portals import (
     update_project_tool,
 )
 from awslabs.aws_iot_sitewise_mcp_server.utils import get_package_version
+from mcp.server.fastmcp import FastMCP
 
 
 async def signal_handler(scope: CancelScope):
@@ -110,7 +108,7 @@ async def signal_handler(scope: CancelScope):
     """
     with open_signal_receiver(signal.SIGINT, signal.SIGTERM) as signals:
         async for _ in signals:  # Shutting down regardless of the signal type
-            print("Shutting down MCP server...")
+            print('Shutting down MCP server...')
             # Force immediate exit since MCP blocks on stdio.
             # You can also use scope.cancel(), but it means after Ctrl+C, you need to press another
             # 'Enter' to unblock the stdio.
@@ -120,10 +118,10 @@ async def signal_handler(scope: CancelScope):
 async def run_server():
     """Run the MCP server with signal handling."""
     mcp = FastMCP(
-        name="sitewise",
-        instructions="A comprehensive AWS IoT SiteWise MCP server providing full functionality for industrial IoT asset management, data ingestion, monitoring, and analytics.",
+        name='sitewise',
+        instructions='A comprehensive AWS IoT SiteWise MCP server providing full functionality for industrial IoT asset management, data ingestion, monitoring, and analytics.',
     )
-    
+
     # Set the server version
     mcp._mcp_server.version = get_package_version()
 
@@ -243,7 +241,7 @@ async def run_server():
 
 def main():
     """Run the MCP server with CLI argument support.
-    
+
     This function initializes and runs the AWS IoT SiteWise MCP server, which provides
     programmatic access to manage AWS IoT SiteWise resources through the Model Context Protocol.
     """
@@ -254,11 +252,11 @@ def main():
         '--version',
         action='version',
         version=f'%(prog)s {get_package_version()}',
-        help='Show the version number and exit'
+        help='Show the version number and exit',
     )
-    
+
     args = parser.parse_args()
-    
+
     # Run the async server
     run(run_server)
 

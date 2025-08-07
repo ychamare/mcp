@@ -5,16 +5,19 @@ import os
 import shutil
 import sys
 
+
 # Add the project source to the path for autodoc
 sys.path.insert(0, os.path.abspath('../src/'))
 
 # Basic project information
 project = 'site-wise-mcp-poc'
 author = 'SiteWiseMCP-PoC Contributors'
-copyright = f"{datetime.datetime.now().year}, {author}"
+copyright = f'{datetime.datetime.now().year}, {author}'
 
 # The full version, including alpha/beta/rc tags
 from importlib.metadata import version as get_version
+
+
 try:
     release = get_version(project)
     # Major.Minor version
@@ -26,8 +29,8 @@ except Exception:
 
 def run_apidoc(app):
     """Generate doc stubs using sphinx-apidoc."""
-    module_dir = os.path.join(app.srcdir, "../src/")
-    output_dir = os.path.join(app.srcdir, "_apidoc")
+    module_dir = os.path.join(app.srcdir, '../src/')
+    output_dir = os.path.join(app.srcdir, '_apidoc')
     excludes = []
 
     # Ensure that any stale apidoc files are cleaned up first.
@@ -35,10 +38,10 @@ def run_apidoc(app):
         shutil.rmtree(output_dir)
 
     cmd = [
-        "--separate",
-        "--module-first",
-        "--doc-project=API Reference",
-        "-o",
+        '--separate',
+        '--module-first',
+        '--doc-project=API Reference',
+        '-o',
         output_dir,
         module_dir,
     ]
@@ -46,25 +49,27 @@ def run_apidoc(app):
 
     try:
         from sphinx.ext import apidoc  # Sphinx >= 1.7
+
         apidoc.main(cmd)
     except ImportError:
         from sphinx import apidoc  # Sphinx < 1.7
+
         cmd.insert(0, apidoc.__file__)
         apidoc.main(cmd)
 
 
 def setup(app):
     """Register our sphinx-apidoc hook."""
-    app.connect("builder-inited", run_apidoc)
+    app.connect('builder-inited', run_apidoc)
 
 
 # Sphinx configuration
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.todo",
-    "sphinx.ext.viewcode",
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
 ]
 
 # Intersphinx mapping
@@ -73,16 +78,16 @@ intersphinx_mapping = {
     'boto3': ('https://boto3.amazonaws.com/v1/documentation/api/latest/', None),
 }
 
-source_suffix = ".rst"
-master_doc = "index"
+source_suffix = '.rst'
+master_doc = 'index'
 
-autoclass_content = "class"
-autodoc_member_order = "bysource"
-default_role = "py:obj"
+autoclass_content = 'class'
+autodoc_member_order = 'bysource'
+default_role = 'py:obj'
 
 # HTML options
-html_theme = "haiku"
-htmlhelp_basename = "{}doc".format(project)
+html_theme = 'haiku'
+htmlhelp_basename = '{}doc'.format(project)
 
 # Napoleon settings
 napoleon_use_rtype = False

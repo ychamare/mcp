@@ -21,6 +21,6 @@ limitations under the License.
 This software includes the following third-party software/licensing:
 
 fastmcp - Apache License 2.0
-pydantic - MIT License  
+pydantic - MIT License
 boto3 - Apache License 2.0
 loguru - MIT License

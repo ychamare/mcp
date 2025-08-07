@@ -4,8 +4,7 @@ from mcp.server.fastmcp.prompts import Prompt
 
 
 def asset_hierarchy_visualization(asset_id: str) -> str:
-    """
-    Generate a comprehensive analysis and visualization of AWS IoT SiteWise asset hierarchies.
+    """Generate a comprehensive analysis and visualization of AWS IoT SiteWise asset hierarchies.
 
     This prompt provides detailed analysis of asset relationships, properties, and health status.
 
@@ -68,6 +67,6 @@ If you encounter any errors, explain what information is missing and suggest alt
 # Create the prompt using from_function
 asset_hierarchy_visualization_prompt = Prompt.from_function(
     asset_hierarchy_visualization,
-    name="asset_hierarchy_visualization",
-    description="Generate comprehensive analysis and visualization of AWS IoT SiteWise asset hierarchies",
+    name='asset_hierarchy_visualization',
+    description='Generate comprehensive analysis and visualization of AWS IoT SiteWise asset hierarchies',
 )
