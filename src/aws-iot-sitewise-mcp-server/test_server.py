@@ -1,8 +1,5 @@
 """Test server for MCP dev command."""
 
-from mcp.server.fastmcp import FastMCP
-from awslabs.aws_iot_sitewise_mcp_server.utils import get_package_version
-
 # Import IoT SiteWise prompts
 from awslabs.aws_iot_sitewise_mcp_server.prompts.asset_hierarchy import (
     asset_hierarchy_visualization_prompt,
@@ -92,11 +89,14 @@ from awslabs.aws_iot_sitewise_mcp_server.tools.sitewise_portals import (
     update_portal_tool,
     update_project_tool,
 )
+from awslabs.aws_iot_sitewise_mcp_server.utils import get_package_version
+from mcp.server.fastmcp import FastMCP
+
 
 # Create the FastMCP instance globally
 mcp = FastMCP(
-    name="sitewise",
-    instructions="A comprehensive AWS IoT SiteWise MCP server providing full functionality for industrial IoT asset management, data ingestion, monitoring, and analytics.",
+    name='sitewise',
+    instructions='A comprehensive AWS IoT SiteWise MCP server providing full functionality for industrial IoT asset management, data ingestion, monitoring, and analytics.',
 )
 
 # Set the server version
